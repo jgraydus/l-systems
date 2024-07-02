@@ -142,7 +142,7 @@ pub fn run() -> Result<(), JsValue> {
             ])
         );
         dragon.compile(canvas_size).execute(&context);
-*/
+
         let plant = LSystem::new(
             "++X",
             HashMap::from([
@@ -160,6 +160,20 @@ pub fn run() -> Result<(), JsValue> {
             ]),
         );
         plant.compile(canvas_size).execute(&context);
+*/
+        let levy = LSystem::new(
+            "F",
+            HashMap::from([
+                ('F', "+F--F+".into())
+            ]),
+            10,
+            HashMap::from([
+                ('F', vec![TurtleCommand::Move(10.0)]),
+                ('+', vec![TurtleCommand::Turn(45.0)]),
+                ('-', vec![TurtleCommand::Turn(-45.0)]),
+            ]),
+        );
+        levy.compile(canvas_size).execute(&context);
         
     });
 
