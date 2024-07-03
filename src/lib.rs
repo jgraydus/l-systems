@@ -1,17 +1,16 @@
 mod examples;
 mod handlers;
 mod l_system;
+mod parser;
 mod turtle;
 mod util;
 
 use gloo_timers::future::TimeoutFuture;
-use std::collections::HashMap;
-use web_sys;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures;
 
 use handlers::*;
-use l_system::*;
+use parser::parse;
 use turtle::*;
 use util::*;
 
@@ -26,11 +25,11 @@ pub fn run() -> Result<(), JsValue> {
 
         let viewport = Viewport { x0: -1000.0, x1: 1000.0, y0: -1000.0, y1: 1000.0 };
 
-        examples::levy().compile().execute(&context, viewport);
+        examples::levy().compile(10).execute(&context, viewport);
         TimeoutFuture::new(1000).await;
         clear_canvas(&context);
         TimeoutFuture::new(1000).await;
-        examples::levy().compile().execute(&context, viewport);
+        examples::levy().compile(10).execute(&context, viewport);
     });
 
     Ok(())
@@ -48,9 +47,35 @@ pub fn draw() -> Result<(), JsValue> {
         let viewport = Viewport { x0: -2000.0, x1: 2000.0, y0: -2000.0 * ratio, y1: 2000.0 * ratio };
         clear_canvas(&context);
         //TimeoutFuture::new(1000).await;
-        examples::levy().compile().execute(&context, viewport);
+        examples::levy().compile(10).execute(&context, viewport);
+        //examples::turtle_example().execute(&context, viewport);
     });
     Ok(())
+}
+
+#[wasm_bindgen]
+pub fn submit(input: String,
+              iterations: u32,
+              zoom: f64) {
+    wasm_bindgen_futures::spawn_local(async move {
+        match parse(&input) {
+            Ok(lsystem) => {
+                let context = get_context2d();
+                let canvas = context.canvas().expect("canvas missing!");
+                canvas.set_width(canvas.client_width() as u32);
+                canvas.set_height(canvas.client_height() as u32);
+                let (width, height) = (canvas.width() as f64, canvas.height() as f64);
+                let ratio = height / width;
+                let base = 1000.0 * zoom;
+                let viewport = Viewport { x0: -base, x1: base, y0: -base * ratio, y1: base * ratio };
+                clear_canvas(&context);
+                lsystem.compile(iterations).execute(&context, viewport);
+            }
+            Err(err) => {
+                web_sys::console::log_1(&err.into());
+            }
+        }
+    });
 }
 
 #[cfg(test)]

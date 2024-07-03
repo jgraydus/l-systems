@@ -2,26 +2,25 @@ use std::collections::HashMap;
 
 use crate::turtle::*;
 
+#[derive(Debug)]
 pub struct LSystem {
     start: String,
     rules: HashMap<char, String>,
-    iterations: u32,
     interpreter: HashMap<char, Vec<TurtleCommand>>,
 }
 
 impl LSystem {
     pub fn new(start: &str,
                rules: HashMap<char, String>,
-               iterations: u32,
                interpreter: HashMap<char, Vec<TurtleCommand>>) -> Self {
         Self {
-            start: start.to_owned(), rules, iterations, interpreter
+            start: start.to_owned(), rules, interpreter
         }
     }
 
-    pub fn expand(&self) -> String {
+    pub fn expand(&self, iterations: u32) -> String {
         let mut s = self.start.clone();
-        for _ in 1..self.iterations {
+        for _ in 1..iterations {
             s = self.apply_rules(s);
         }
         s
@@ -42,9 +41,9 @@ impl LSystem {
         result
     }
 
-    pub fn compile(&self) -> TurtleProgram {
+    pub fn compile(&self, iterations: u32) -> TurtleProgram {
         let mut result = Vec::new();
-        let s = self.expand();
+        let s = self.expand(iterations);
         for c in s.chars() {
             if let Some(r) = self.interpreter.get(&c) {
                 result.append(&mut r.clone());

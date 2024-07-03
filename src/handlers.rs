@@ -7,12 +7,12 @@ use web_sys::{
 
 pub fn set_up_mouse_handlers() -> () {
     let handle_mousedown = {
-        Closure::<dyn FnMut(MouseEvent)>::new(move |evt: MouseEvent| {
+        Closure::<dyn FnMut(MouseEvent)>::new(move |_evt: MouseEvent| {
             // TODO
         })
     };
     let handle_mouseup = {
-        Closure::<dyn FnMut(MouseEvent)>::new(move |evt: MouseEvent| {
+        Closure::<dyn FnMut(MouseEvent)>::new(move |_evt: MouseEvent| {
             // TODO
         })
     };

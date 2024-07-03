@@ -1,6 +1,5 @@
 use web_sys;
 use wasm_bindgen::prelude::*;
-use wasm_bindgen_futures;
 
 pub fn get_canvas() -> web_sys::HtmlCanvasElement {
     let window = web_sys::window().unwrap();

@@ -36,10 +36,16 @@
 		    }
                 </style>
 		<script>
+			window.zoom = 1.0;
+
 			function doIt() {
 			    console.log("DOING IT");
 			    if (window.x) {
-			        window.x.draw();
+                                const editor = document.getElementById("editor");
+                                const value = editor.value;
+                                console.log(value);
+
+			        window.x.submit(value, 12, 1.0);
 			    }
 			}
 		</script>
@@ -48,11 +54,29 @@
 		<div id="main">
 			<canvas id="canvas"></canvas>
 			<div id="controls">
-				<textarea></textarea>
+<textarea id="editor">
+LSYSTEM (
+     F,
+     (F -&gt; +F--F+),
+     (F -&gt; (MOVE 40), + -&gt; (TURN 45), - -&gt; (TURN -45)) 
+ )
+</textarea>
 				<button onclick="doIt()">submit</button>
 			</div>
 		</div>
 
 		<script src="index.js"></script>
+		<script>
+			let canvas = document.getElementById("canvas");
+			if (canvas) {
+			    canvas.onwheel = evt => {
+                                if (evt.deltaY < 0) {
+                                    window.zoom = window.zoom * 2;
+                                } else {
+                                    window.zoom = window.zoom / 2;
+                                }
+			    } 
+			}
+	        </script>
 	</body>
 </html>

@@ -34,19 +34,36 @@ pub fn turtle_example() -> TurtleProgram {
     }
 }
 
-pub fn algae() -> LSystem {
+/*
+
+   LSYSTEM
+   [  A,
+      [A -> AB, B -> A],
+      [A -> [MOVE 40.0], B -> [MOVE 40.0, TURN 25.0]]
+   ]
+
+*/
+
+pub fn algae() -> (String, LSystem) {
+    (
+r#"
+LSYSTEM (
+    A,
+    (A -> AB, B -> A),
+    (A -> (MOVE 40), B -> (MOVE 40, TURN 25))
+)
+"#.into(),
     LSystem::new(
         "A",
         HashMap::from([
             ('A', "AB".into()),
             ('B', "A".into()),
         ]),
-        5,
         HashMap::from([
             ('A', vec![TurtleCommand::Move(40.0)]),
             ('B', vec![TurtleCommand::Move(40.0), TurtleCommand::Turn(25.0)]),
         ]),
-    )
+    ))
 }
 
 pub fn koch() -> LSystem {
@@ -55,7 +72,6 @@ pub fn koch() -> LSystem {
         HashMap::from([
             ('F', "F+F-F-F+F".into())
         ]),
-        6,
         HashMap::from([
             ('F', vec![TurtleCommand::Move(10.0)]),
             ('+', vec![TurtleCommand::Turn(90.0)]),
@@ -71,7 +87,6 @@ pub fn sierpinski() -> LSystem {
             ('F', "F-G+F+G-F".into()),
             ('G', "GG".into()),
         ]),
-        7,
         HashMap::from([
             ('F', vec![TurtleCommand::Move(10.0)]),
             ('G', vec![TurtleCommand::Move(10.0)]),
@@ -88,7 +103,6 @@ pub fn tree() -> LSystem {
             ('1', "11".into()),
             ('0', "1[+0]-0".into()),
         ]),
-        6,
         HashMap::from([
             ('0', vec![TurtleCommand::Move(5.0)]),
             ('1', vec![TurtleCommand::Move(5.0)]),
@@ -107,7 +121,6 @@ pub fn dragon() -> LSystem {
             ('F', "F+G".into()),
             ('G', "F-G".into()),
         ]),
-        13,
         HashMap::from([
             ('F', vec![TurtleCommand::Move(10.0)]),
             ('G', vec![TurtleCommand::Move(10.0)]),
@@ -124,7 +137,6 @@ pub fn plant() -> LSystem {
             ('X', "F+[[X]-X]-F[-FX]+X".into()),
             ('F', "FF".into()),
         ]),
-        5,
         HashMap::from([
             ('F', vec![TurtleCommand::Move(10.0)]),
             ('X', vec![]),
@@ -142,7 +154,6 @@ pub fn levy() -> LSystem {
         HashMap::from([
             ('F', "+F--F+".into())
         ]),
-        13,
         HashMap::from([
             ('F', vec![TurtleCommand::Move(10.0)]),
             ('+', vec![TurtleCommand::Turn(45.0)]),
