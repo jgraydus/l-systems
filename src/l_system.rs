@@ -42,7 +42,7 @@ impl LSystem {
         result
     }
 
-    pub fn compile(&self, canvas_size: (f64, f64)) -> TurtleProgram {
+    pub fn compile(&self) -> TurtleProgram {
         let mut result = Vec::new();
         let s = self.expand();
         for c in s.chars() {
@@ -62,7 +62,6 @@ impl LSystem {
                 },
             },
             commands: result,
-            canvas_size
         }
     }
 }

@@ -1,4 +1,5 @@
 import("../pkg/index.js").then(x => {
-	x.run()
+//	x.run()
+	window.x = x;
 }).catch(console.error);
 

@@ -4,11 +4,55 @@
 		<meta charset="UTF-8">
 		<title>L-Systems</title>
                 <style>
-                    body { background-color: black; }
+                    body {
+			    background-color: black;
+			    margin: 0;
+		    }
+		    body * {
+			    box-sizing: border-box;
+		    }
+		    #canvas {
+			    border: 1px solid red;
+			    height: 100%;
+			    width: 100%;
+		    }
+		    #main {
+			    position: absolute;
+			    top: 0;
+			    bottom: 0;
+			    left: 0;
+			    right: 0;
+			    display: flex;
+			    flex-direction: row;
+		    }
+		    #controls {
+			    padding: 10px;
+			    width: 800px;
+			    display: flex;
+			    flex-direction: column;
+		    }
+		    #controls textarea {
+			    height: 1000px;
+		    }
                 </style>
+		<script>
+			function doIt() {
+			    console.log("DOING IT");
+			    if (window.x) {
+			        window.x.draw();
+			    }
+			}
+		</script>
 	</head>
 	<body>
-		<canvas id="canvas" height="600px" width="600px" />
+		<div id="main">
+			<canvas id="canvas"></canvas>
+			<div id="controls">
+				<textarea></textarea>
+				<button onclick="doIt()">submit</button>
+			</div>
+		</div>
+
 		<script src="index.js"></script>
 	</body>
 </html>

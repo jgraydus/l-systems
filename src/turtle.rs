@@ -48,26 +48,55 @@ pub enum DrawCommand {
     Stroke,
 }
 
-impl DrawCommand {
-    fn exec(&self, context: &web_sys::CanvasRenderingContext2d, canvas_size: (f64, f64)) {
-        let (width, height) = canvas_size;
-        let (delta_x, delta_y) = (width / 2.0, height / 2.0);
+#[derive(Clone, Copy, Debug)]
+pub struct Viewport {
+    pub x0: f64, pub x1: f64, pub y0: f64, pub y1: f64
+}
 
+impl DrawCommand {
+    fn exec(&self,
+            context: &web_sys::CanvasRenderingContext2d,
+            delta_x: f64,
+            delta_y: f64,
+            alpha: f64,
+            beta: f64) {
         match self {
-            DrawCommand::BeginPath => { context.begin_path(); }
-            DrawCommand::SetLineWidth(lw) => { context.set_line_width(*lw); }
-            DrawCommand::SetStrokeStyle(s) => { context.set_stroke_style(&JsValue::from_str(&s)); }
-            DrawCommand::MoveTo(x, y) => { context.move_to(*x + delta_x, -(*y - delta_y)); }
-            DrawCommand::LineTo(x, y) => { context.line_to(*x + delta_x, -(*y - delta_y)); }
-            DrawCommand::Stroke => { context.stroke(); }
+            DrawCommand::BeginPath => {
+                context.begin_path();
+            }
+            DrawCommand::SetLineWidth(lw) => {
+                context.set_line_width(*lw);
+            }
+            DrawCommand::SetStrokeStyle(s) => {
+                context.set_stroke_style(&JsValue::from_str(&s));
+            }
+            DrawCommand::MoveTo(x, y) => {
+                let x = (*x - delta_x) * alpha;
+                let y = (*y - delta_y) * beta;
+                context.move_to(x, y);
+            }
+            DrawCommand::LineTo(x, y) => {
+                let x = (*x - delta_x) * alpha;
+                let y = (*y - delta_y) * beta;
+                context.line_to(x, y);
+            }
+            DrawCommand::Stroke => {
+                context.stroke();
+            }
         }
     }
 
-    fn exec_all(context: &web_sys::CanvasRenderingContext2d,
-                commands: &Vec<DrawCommand>,
-                canvas_size: (f64, f64)) {
+    fn exec_all(commands: &Vec<DrawCommand>,
+                context: &web_sys::CanvasRenderingContext2d,
+                viewport: Viewport) {
+        let canvas = context.canvas().expect("canvas missing!");
+        let (width, height) = (canvas.width() as f64, canvas.height() as f64);
+        let Viewport { x0, x1, y0, y1 } = viewport;
+        let alpha = width / (x1 - x0);
+        let beta = height / (y0 - y1);
+
         for command in commands.iter() {
-            command.exec(context, canvas_size);
+            command.exec(context, x0, y1, alpha, beta);
         }
     }
 }
@@ -126,13 +155,14 @@ impl Turtle {
 pub struct TurtleProgram {
     pub turtle: Turtle,
     pub commands: Vec<TurtleCommand>,
-    pub canvas_size: (f64, f64),
 }
 
 impl TurtleProgram {
-    pub fn execute(mut self, context: &web_sys::CanvasRenderingContext2d) {
+    pub fn execute(mut self,
+                   context: &web_sys::CanvasRenderingContext2d,
+                   viewport: Viewport) {
         let commands = self.run();
-        DrawCommand::exec_all(context, &commands, self.canvas_size);
+        DrawCommand::exec_all(&commands, context, viewport);
     }
 
     pub fn run(&mut self) -> Vec<DrawCommand> {
