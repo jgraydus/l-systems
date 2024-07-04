@@ -41,11 +41,16 @@
 			function doIt() {
 			    console.log("DOING IT");
 			    if (window.x) {
+				if (!window.controller) {
+				   window.controller = window.x.init(); 
+				}
                                 const editor = document.getElementById("editor");
                                 const value = editor.value;
                                 console.log(value);
 
-			        window.x.submit(value, 12, 1.0);
+			        //window.x.submit(value, 12, 1.0);
+				window.controller.set_program(value);
+			        window.controller.draw();
 			    }
 			}
 		</script>

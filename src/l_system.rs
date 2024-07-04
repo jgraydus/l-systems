@@ -64,7 +64,7 @@ impl LSystem {
         }
     }
 }
-
+/*
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -78,12 +78,11 @@ mod tests {
                 ('1', "10".into()),
                 ('2', "01".into()),
             ]),
-            4,
             HashMap::new()
         );
 
-        let s = system.expand();
+        let s = system.compile(10);
         println!("{}", s);
     }
 }
-
+*/

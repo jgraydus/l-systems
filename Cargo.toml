@@ -29,6 +29,7 @@ features = [
     "Document",
     "Element",
     "HtmlCanvasElement",
+    "KeyboardEvent",
     "MouseEvent",
     "Window",
     "WheelEvent",
