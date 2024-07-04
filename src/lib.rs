@@ -8,8 +8,9 @@ use std::{cell::RefCell, rc::Rc};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures;
 use web_sys::{
-    KeyboardEvent,
-    WheelEvent,
+    Event,
+//    KeyboardEvent,
+//    WheelEvent,
 };
 
 use parser::parse;
@@ -45,29 +46,29 @@ pub fn init() -> Controller {
         viewport: viewport,
     }));
 
+    let handle_resize = {
+        let state = state.clone();
+        Closure::<dyn FnMut(Event)>::new(move |_: Event| {
+            let canvas = get_context2d().canvas().expect("canvas missing!");
+            canvas.set_width(canvas.client_width() as u32);
+            canvas.set_height(canvas.client_height() as u32);
+            let (width, height) = (canvas.width() as f64, canvas.height() as f64);
+            let ratio = height / width;
+            let Viewport { x0, x1, .. } = state.borrow().viewport.clone();
+            let viewport = Viewport { x0, x1, y0: x0 * ratio, y1: x1 * ratio };
+            state.borrow_mut().viewport = viewport;
+            state.borrow().draw();
+        })
+    };
+    let window = web_sys::window().expect("no window?!");
+    window.set_onresize(Some(handle_resize.as_ref().unchecked_ref()));
+    handle_resize.forget();
+/*
     let handle_wheel = {
         let state = state.clone();
         Closure::<dyn FnMut(WheelEvent)>::new(move |evt: WheelEvent| {
-            let canvas = get_context2d().canvas().expect("canvas missing!");
-            let (w, h) = (canvas.client_width() as f64, canvas.client_height() as f64);
-            let ratio = h / w;
-
-            let Viewport { x0, x1, y0, y1 } = state.borrow().viewport.clone();
-
-            let center_x = (x0 + x1) / 2.0; 
-            let center_y = (y0 + y1) / 2.0; 
-
-            let zoom = if evt.delta_y() > 0.0 { 1.1 } else { 0.9 };
-
-            let half_width = (x1 - x0) / 2.0 * zoom;
-            let half_height = half_width * ratio;
-
-            let viewport = Viewport { x0: center_x - half_width,
-                                      x1: center_x + half_width,
-                                      y0: center_y - half_height,
-                                      y1: center_y + half_height };
-
-            state.borrow_mut().viewport = viewport; 
+            let multiplier = if evt.delta_y() > 0.0 { 1.1 } else { 0.9 };
+            state.borrow_mut().zoom(multiplier);
             state.borrow().draw();
         })
     };
@@ -97,14 +98,14 @@ pub fn init() -> Controller {
     };
     window.set_onkeydown(Some(handle_keypress.as_ref().unchecked_ref()));
     handle_keypress.forget();
-
+*/
     Controller {
         state: state.clone()
     }
 }
 
 impl State {
-    pub fn draw(&self) {
+    fn draw(&self) {
         let program = self.program.clone();
         let iterations = self.iterations;
         let viewport = self.viewport.clone();
@@ -125,6 +126,27 @@ impl State {
             });
         }
     }
+
+    fn zoom(&mut self, multiplier: f64) {
+            let canvas = get_context2d().canvas().expect("canvas missing!");
+            let (w, h) = (canvas.client_width() as f64, canvas.client_height() as f64);
+            let ratio = h / w;
+
+            let Viewport { x0, x1, y0, y1 } = self.viewport.clone();
+
+            let center_x = (x0 + x1) / 2.0; 
+            let center_y = (y0 + y1) / 2.0; 
+
+            let half_width = (x1 - x0) / 2.0 * multiplier;
+            let half_height = half_width * ratio;
+
+            let viewport = Viewport { x0: center_x - half_width,
+                                      x1: center_x + half_width,
+                                      y0: center_y - half_height,
+                                      y1: center_y + half_height };
+
+            self.viewport = viewport; 
+    }
 }
 
 #[wasm_bindgen]
@@ -137,41 +159,12 @@ impl Controller {
         self.state.borrow_mut().iterations = iterations;
     }
 
-    pub fn set_viewport(&self, viewport: Viewport) {
-        self.state.borrow_mut().viewport = viewport;
+    pub fn zoom(&self, multiplier: f64) {
+        self.state.borrow_mut().zoom(multiplier);
     }
 
     pub fn draw(&self) {
         self.state.borrow().draw();
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::turtle::*;
-
-    #[test]
-    fn test_01() {
-        let mut program = TurtleProgram {
-            turtle: Turtle {
-                location: (0.0, 0.0),
-                orientation: 0.0,
-                pen: Pen {
-                    color: (1.0, 1.0, 1.0),
-                    width: 3.0,
-                    state: PenState::Down,
-                }
-            },
-            commands: vec![
-                TurtleCommand::Turn(45.0_f64.to_radians()),
-                TurtleCommand::Move(100.0),
-                TurtleCommand::Turn(45.0_f64.to_radians()),
-                TurtleCommand::Move(100.0),
-            ],
-        };
-
-        let result = program.run();
-        println!("{:?}", result);
     }
 }
 

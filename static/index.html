@@ -34,24 +34,49 @@
 		    #controls textarea {
 			    height: 1000px;
 		    }
+		    #subcontrols {
+			    display: flex;
+			    flex-direction: row;
+		    }
+		    #spacer {
+			   width: 100%; 
+		    }
                 </style>
 		<script>
-			window.zoom = 1.0;
+			let iterations = 10;
 
 			function doIt() {
-			    console.log("DOING IT");
 			    if (window.x) {
 				if (!window.controller) {
 				   window.controller = window.x.init(); 
 				}
                                 const editor = document.getElementById("editor");
                                 const value = editor.value;
-                                console.log(value);
-
-			        //window.x.submit(value, 12, 1.0);
 				window.controller.set_program(value);
+				window.controller.set_iterations(iterations);
 			        window.controller.draw();
 			    }
+			}
+
+			function incrementIterations() {
+				iterations += 1;
+				document.getElementById("iterations").value = iterations;
+				doIt();
+			}
+
+			function decrementIterations() {
+				if (iterations > 1) {
+					iterations -= 1;
+				}
+				document.getElementById("iterations").value = iterations;
+				doIt();
+			}
+
+			function zoom(multiplier) {
+				if (window.controller) {
+				        window.controller.zoom(multiplier);
+				        doIt();
+				}
 			}
 		</script>
 	</head>
@@ -66,22 +91,19 @@ LSYSTEM (
      (F -&gt; (MOVE 40), + -&gt; (TURN 45), - -&gt; (TURN -45)) 
  )
 </textarea>
+
+                                <div id="subcontrols">
+					<input id="iterations" value="10"></input>
+					<button onclick="decrementIterations()">&lt;</button>
+					<button onclick="incrementIterations()">&gt;</button>
+					<div id="spacer"></div>
+					<button onclick="zoom(1.1)">-</button>
+					<button onclick="zoom(0.9)">+</button>
+				</div>
 				<button onclick="doIt()">submit</button>
 			</div>
 		</div>
 
 		<script src="index.js"></script>
-		<script>
-			let canvas = document.getElementById("canvas");
-			if (canvas) {
-			    canvas.onwheel = evt => {
-                                if (evt.deltaY < 0) {
-                                    window.zoom = window.zoom * 2;
-                                } else {
-                                    window.zoom = window.zoom / 2;
-                                }
-			    } 
-			}
-	        </script>
 	</body>
 </html>

@@ -27,7 +27,7 @@ pub struct Turtle {
     pub pen: Pen
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum TurtleCommand {
     Move(f64),
     Turn(f64),

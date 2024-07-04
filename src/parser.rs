@@ -141,18 +141,25 @@ pub fn parse(input: &str) -> Result<LSystem, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::examples::*;
 
-    #[test]
-    fn test_01() {
-        let example = r#"
-LSYSTEM
-(  A,
-   (A -> AB, B -> A),
-   (A -> (MOVE 40.0),  B -> (MOVE 40.0, TURN -25.0))
-)
-        "#;
-        let result = parse(example);
-        println!("{:?}", result);
+    macro_rules! generate_test {
+        ($function_name:ident, $source:expr, $lsystem: expr) => {
+            #[test]
+            fn $function_name() {
+                let actual = parse($source).unwrap();
+                let expected = $lsystem();
+                assert_eq!(actual, expected);
+            }
+        }
     }
+
+    // TODO proc macro for this?
+    generate_test!(algae, ALGAE.1, ALGAE.2);
+    generate_test!(koch, KOCH.1, KOCH.2);
+    generate_test!(sierpinski, SIERPINSKI.1, SIERPINSKI.2);
+    generate_test!(tree, TREE.1, TREE.2);
+    generate_test!(dragon, DRAGON.1, DRAGON.2);
+    generate_test!(levy, LEVY.1, LEVY.2);
 }
 

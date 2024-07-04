@@ -2,6 +2,7 @@
 
 use std::collections::HashMap;
 use crate::l_system::*;
+use crate::parser::*;
 use crate::turtle::*;
 
 pub fn turtle_example() -> TurtleProgram {
@@ -34,26 +35,18 @@ pub fn turtle_example() -> TurtleProgram {
     }
 }
 
-/*
+type LSystemExample = (&'static str, &'static str, fn() -> LSystem);
 
-   LSYSTEM
-   [  A,
-      [A -> AB, B -> A],
-      [A -> [MOVE 40.0], B -> [MOVE 40.0, TURN 25.0]]
-   ]
-
-*/
-
-pub fn algae() -> (String, LSystem) {
-    (
-r#"
-LSYSTEM (
-    A,
-    (A -> AB, B -> A),
-    (A -> (MOVE 40), B -> (MOVE 40, TURN 25))
-)
-"#.into(),
-    LSystem::new(
+pub const ALGAE: LSystemExample = (
+    "algae",
+    r#"
+    LSYSTEM (
+        A,
+        (A -> AB, B -> A),
+        (A -> (MOVE 40), B -> (MOVE 40, TURN 25))
+    )
+    "#,
+    || LSystem::new(
         "A",
         HashMap::from([
             ('A', "AB".into()),
@@ -63,11 +56,19 @@ LSYSTEM (
             ('A', vec![TurtleCommand::Move(40.0)]),
             ('B', vec![TurtleCommand::Move(40.0), TurtleCommand::Turn(25.0)]),
         ]),
-    ))
-}
+    )
+);
 
-pub fn koch() -> LSystem {
-    LSystem::new(
+pub const KOCH: LSystemExample = (
+    "koch",
+    r#"
+    LSYSTEM (
+        F,
+        (F -> F+F-F-F+F),
+        (F -> (MOVE 10), + -> (TURN 90), - -> (TURN -90))
+    )
+    "#, 
+    || LSystem::new(
         "F",
         HashMap::from([
             ('F', "F+F-F-F+F".into())
@@ -78,10 +79,18 @@ pub fn koch() -> LSystem {
             ('-', vec![TurtleCommand::Turn(-90.0)]),
         ]),
     )
-}
+);
 
-pub fn sierpinski() -> LSystem {
-    LSystem::new(
+pub const SIERPINSKI: LSystemExample = (
+    "sierpinski",
+    r#"
+    LSYSTEM (
+        F-G-G,
+        (F -> F-G+F+G-F, G -> GG),
+        (F -> (MOVE 10), G -> (MOVE 10), + -> (TURN 120), - -> (TURN -120))
+    )
+    "#,
+    || LSystem::new(
         "F-G-G",
         HashMap::from([
             ('F', "F-G+F+G-F".into()),
@@ -94,10 +103,23 @@ pub fn sierpinski() -> LSystem {
             ('-', vec![TurtleCommand::Turn(-120.0)]),
         ]),
     )
-}
+);
 
-pub fn tree() -> LSystem {
-    LSystem::new(
+pub const TREE: LSystemExample = (
+    "tree",
+    r#"
+    LSYSTEM (
+        [0]++[0]++[0]++[0],
+        (1 -> 11, 0 -> 1[+0]-0),
+        (0 -> (MOVE 5),
+         1 -> (MOVE 5),
+         [ -> (PUSH),
+         ] -> (POP),
+         + -> (TURN 45),
+         - -> (TURN -45))
+    )
+    "#,
+    || LSystem::new(
         "[0]++[0]++[0]++[0]",
         HashMap::from([
             ('1', "11".into()),
@@ -112,10 +134,21 @@ pub fn tree() -> LSystem {
             ('-', vec![TurtleCommand::Turn(-45.0)]),
         ]),
     )
-}
+);
 
-pub fn dragon() -> LSystem {
-    LSystem::new(
+pub const DRAGON: LSystemExample = (
+    "dragon",
+    r#"
+    LSYSTEM (
+        F,
+        (F -> F+G, G -> F-G),
+        (F -> (MOVE 10),
+         G -> (MOVE 10),
+         + -> (TURN 90),
+         - -> (TURN -90))
+    )
+    "#,
+    || LSystem::new(
         "F",
         HashMap::from([
             ('F', "F+G".into()),
@@ -128,10 +161,22 @@ pub fn dragon() -> LSystem {
             ('-', vec![TurtleCommand::Turn(-90.0)]),
         ])
     )
-}
+);
 
-pub fn plant() -> LSystem {
-    LSystem::new(
+pub const PLANT: LSystemExample = (
+    "plant",
+    r#"
+    LSYSTEM (
+        ++X,
+        (X -> F+[[X]-X]-F[-FX]+X, F -> FF),
+        (F -> (MOVE 10),
+         + -> (TURN 25),
+         - -> (TURN -25),
+         [ -> (PUSH),
+         ] -> (POP))
+    )
+    "#,
+    || LSystem::new(
         "++X",
         HashMap::from([
             ('X', "F+[[X]-X]-F[-FX]+X".into()),
@@ -146,10 +191,18 @@ pub fn plant() -> LSystem {
             (']', vec![TurtleCommand::Pop]),
         ]),
     )
-}
+);
 
-pub fn levy() -> LSystem {
-    LSystem::new(
+pub const LEVY: LSystemExample = (
+    "levy",
+    r#"
+    LSYSTEM (
+        F,
+        (F -> +F--F+),
+        (F -> (MOVE 10), + -> (TURN 45), - -> (TURN -45))
+    )
+    "#,
+    || LSystem::new(
         "F",
         HashMap::from([
             ('F', "+F--F+".into())
@@ -160,5 +213,5 @@ pub fn levy() -> LSystem {
             ('-', vec![TurtleCommand::Turn(-45.0)]),
         ]),
     )
-}
+);
 

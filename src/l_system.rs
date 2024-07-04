@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::turtle::*;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct LSystem {
     start: String,
     rules: HashMap<char, String>,
@@ -64,25 +64,4 @@ impl LSystem {
         }
     }
 }
-/*
-#[cfg(test)]
-mod tests {
-    use super::*;
 
-    #[test]
-    fn test_01() {
-        let system = LSystem::new(
-            "0",
-            HashMap::from([
-                ('0', "212".into()),
-                ('1', "10".into()),
-                ('2', "01".into()),
-            ]),
-            HashMap::new()
-        );
-
-        let s = system.compile(10);
-        println!("{}", s);
-    }
-}
-*/
