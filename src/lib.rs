@@ -6,7 +6,6 @@ mod util;
 
 use std::{cell::RefCell, rc::Rc};
 use wasm_bindgen::prelude::*;
-use wasm_bindgen_futures;
 use web_sys::{Event};
 
 use examples::all_examples;
@@ -63,7 +62,7 @@ pub fn init() -> Controller {
             let Viewport { x0, x1, .. } = state.borrow().viewport.clone();
             let viewport = Viewport { x0, x1, y0: x0 * ratio, y1: x1 * ratio };
             state.borrow_mut().viewport = viewport;
-            state.borrow().draw();
+            let _ = state.borrow().draw();
         })
     };
     let window = web_sys::window().expect("no window?!");
@@ -76,26 +75,27 @@ pub fn init() -> Controller {
 }
 
 impl State {
-    fn draw(&self) {
+    fn draw(&self) -> Result<(), JsValue>{
         let program = self.program.clone();
         let iterations = self.iterations;
         let viewport = self.viewport.clone();
 
         if let Some(input) = program {
-            wasm_bindgen_futures::spawn_local(async move {
-                match parse(&input) {
-                    Ok(lsystem) => {
-                        let program = lsystem.compile(iterations);
-                        let context = get_context2d();
-                        clear_canvas(&context);
-                        program.execute(&context, viewport);
-                    }
-                    Err(err) => {
-                        web_sys::console::log_1(&err.into());
-                    }
+            match parse(&input) {
+                Ok(lsystem) => {
+                    let program = lsystem.compile(iterations);
+                    let context = get_context2d();
+                    clear_canvas(&context);
+                    program.execute(&context, viewport);
+                    return Ok(());
                 }
-            });
+                Err(err) => {
+                    web_sys::console::log_1(&err.clone().into());
+                    return Err(err.into());
+                }
+            }
         }
+        Err("program is not set".into())
     }
 
     fn zoom(&mut self, multiplier: f64) {
@@ -134,8 +134,8 @@ impl Controller {
         self.state.borrow_mut().zoom(multiplier);
     }
 
-    pub fn draw(&self) {
-        self.state.borrow().draw();
+    pub fn draw(&self) -> Result<(), JsValue> {
+        self.state.borrow().draw()
     }
 }
 
