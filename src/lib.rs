@@ -90,7 +90,6 @@ impl State {
                     return Ok(());
                 }
                 Err(err) => {
-                    web_sys::console::log_1(&err.clone().into());
                     return Err(err.into());
                 }
             }
