@@ -153,6 +153,7 @@ impl Turtle {
     }
 }
 
+#[derive(Debug)]
 pub struct TurtleProgram {
     pub turtle: Turtle,
     pub commands: Vec<TurtleCommand>,

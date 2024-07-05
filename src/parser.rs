@@ -11,6 +11,7 @@ use std::str::FromStr;
 WHITESPACE = _{ " " | "\t" | NEWLINE }
 
 number = { "-"? ~ ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? }
+positive_integer = { ASCII_NONZERO_DIGIT ~ ASCII_DIGIT* }
 
 special_char = { "!" | "@" | "#" | "$" | "%" | "^" | "&" | "*" | "-" | "=" | "+" | "_" | "~"}
 puncuation_char = { "." | ";" | ":" | "'" | "`" }
@@ -21,7 +22,7 @@ lsystem_start_value = { valid_char+ }
 
 lsystem_rule_rhs = { valid_char+ }
 lsystem_rule = { valid_char ~ "->" ~ lsystem_rule_rhs }
-lsystem_rules = { "(" ~ lsystem_rule ~ ("," ~ lsystem_rule)* ~ ")" }
+lsystem_rules = { "(" ~ lsystem_rule* ~ ("," ~ lsystem_rule)* ~ ")" }
 
 turtle_command_move = { "MOVE" ~ number }
 turtle_command_turn = { "TURN" ~ number }
@@ -29,6 +30,7 @@ turtle_command_push = { "PUSH" }
 turtle_command_pop = { "POP" }
 turtle_command_pen_up = { "PEN" ~ "UP" }
 turtle_command_pen_down = { "PEN" ~ "DOWN" }
+turtle_command_repeat = { "REPEAT" ~ positive_integer ~ turtle_program }
 
 turtle_command = { turtle_command_move
                  | turtle_command_turn
@@ -36,6 +38,7 @@ turtle_command = { turtle_command_move
                  | turtle_command_pop
                  | turtle_command_pen_up
                  | turtle_command_pen_down
+                 | turtle_command_repeat
                  }
 turtle_commands = { turtle_command ~ ("," ~ turtle_command)* }
 turtle_program = { "(" ~ turtle_commands? ~ ")" }
@@ -77,6 +80,10 @@ fn to_f64(pair: Pair<Rule>) -> f64 {
     f64::from_str(pair.as_str()).expect("failed to parse f64")
 }
 
+fn to_positive_integer(pair: Pair<Rule>) -> u32 {
+    u32::from_str(pair.as_str().trim()).expect("failed to parse u32")
+}
+
 fn to_turtle_command(pair: Pair<Rule>) -> TurtleCommand {
     let item = pair.into_inner().next().unwrap();
     match item.as_rule() {
@@ -92,6 +99,12 @@ fn to_turtle_command(pair: Pair<Rule>) -> TurtleCommand {
         Rule::turtle_command_pop => TurtleCommand::Pop,
         Rule::turtle_command_pen_up => TurtleCommand::PenUp,
         Rule::turtle_command_pen_down => TurtleCommand::PenDown,
+        Rule::turtle_command_repeat => {
+            let mut item = item.into_inner();
+            let n = to_positive_integer(item.next().unwrap());
+            let cs = to_turtle_program(item.next().unwrap());
+            TurtleCommand::Repeat(n, cs)
+        }
         _ => panic!("failed to match turtle command rule")
     }
 }
@@ -147,7 +160,9 @@ mod tests {
         ($function_name:ident, $source:expr, $lsystem: expr) => {
             #[test]
             fn $function_name() {
-                let actual = parse($source).unwrap();
+                let actual = parse($source);
+                assert!(actual.is_ok());
+                let actual = actual.unwrap();
                 let expected = $lsystem();
                 assert_eq!(actual, expected);
             }
@@ -162,5 +177,6 @@ mod tests {
     generate_test!(dragon, DRAGON.1, DRAGON.2);
     generate_test!(plant, PLANT.1, PLANT.2);
     generate_test!(levy, LEVY.1, LEVY.2);
+    generate_test!(grapes, GRAPES.1, GRAPES.2);
 }
 

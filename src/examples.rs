@@ -200,6 +200,38 @@ r#"LSYSTEM (
     )
 );
 
-pub fn all_examples() -> [LSystemExample; 7] {
-    [ALGAE, KOCH, SIERPINSKI, TREE, DRAGON, PLANT, LEVY]
+pub const GRAPES: LSystemExample = (
+    "grapes",
+r#"LSYSTEM (
+    -0,
+    (1 -> 11, 0 -> 1[+02]-02),
+    (0 -> (MOVE 5),
+     1 -> (MOVE 5),
+     2 -> (REPEAT 8 (MOVE 3, TURN 20)),
+     [ -> (PUSH),
+     ] -> (POP),
+     + -> (TURN 45),
+     - -> (TURN -85))
+)"#,
+    || LSystem::new(
+        "-0",
+        HashMap::from([
+            ('1', "11".into()),
+            ('0', "1[+02]-02".into()),
+        ]),
+        HashMap::from([
+            ('0', vec![TurtleCommand::Move(5.0)]),
+            ('1', vec![TurtleCommand::Move(5.0)]),
+            ('2', vec![TurtleCommand::Repeat(8, vec![TurtleCommand::Move(3.0), TurtleCommand::Turn(20.0)])]),
+            ('[', vec![TurtleCommand::Push]),
+            (']', vec![TurtleCommand::Pop]),
+            ('+', vec![TurtleCommand::Turn(45.0)]),
+            ('-', vec![TurtleCommand::Turn(-85.0)]),
+        ])
+    )
+);
+
+pub fn all_examples() -> [LSystemExample; 8] {
+    [ALGAE, KOCH, SIERPINSKI, TREE, DRAGON, PLANT, LEVY, GRAPES]
 }
+
