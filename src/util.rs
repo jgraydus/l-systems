@@ -22,7 +22,7 @@ pub fn clear_canvas(context: &web_sys::CanvasRenderingContext2d) {
     let canvas = context.canvas().expect("canvas is missing");
     let (width, height) = (canvas.width() as f64, canvas.height() as f64);
     context.begin_path();
-    context.set_fill_style(&JsValue::from_str("black"));
+    context.set_fill_style(&JsValue::from_str("#111111"));
     context.rect(0.0, 0.0, width, height);
     context.fill();
 }
