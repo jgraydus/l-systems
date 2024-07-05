@@ -160,6 +160,7 @@ mod tests {
     generate_test!(sierpinski, SIERPINSKI.1, SIERPINSKI.2);
     generate_test!(tree, TREE.1, TREE.2);
     generate_test!(dragon, DRAGON.1, DRAGON.2);
+    generate_test!(plant, PLANT.1, PLANT.2);
     generate_test!(levy, LEVY.1, LEVY.2);
 }
 

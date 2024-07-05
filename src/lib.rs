@@ -7,15 +7,21 @@ mod util;
 use std::{cell::RefCell, rc::Rc};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures;
-use web_sys::{
-    Event,
-//    KeyboardEvent,
-//    WheelEvent,
-};
+use web_sys::{Event};
 
+use examples::all_examples;
 use parser::parse;
 use turtle::*;
 use util::*;
+
+#[wasm_bindgen]
+pub fn examples() -> js_sys::Map {
+    let result = js_sys::Map::new();
+    for (name, source, _) in all_examples() {
+        result.set(&name.into(), &source.into());
+    }
+    result
+}
 
 #[wasm_bindgen]
 struct State {
@@ -63,42 +69,7 @@ pub fn init() -> Controller {
     let window = web_sys::window().expect("no window?!");
     window.set_onresize(Some(handle_resize.as_ref().unchecked_ref()));
     handle_resize.forget();
-/*
-    let handle_wheel = {
-        let state = state.clone();
-        Closure::<dyn FnMut(WheelEvent)>::new(move |evt: WheelEvent| {
-            let multiplier = if evt.delta_y() > 0.0 { 1.1 } else { 0.9 };
-            state.borrow_mut().zoom(multiplier);
-            state.borrow().draw();
-        })
-    };
-    let window = web_sys::window().expect("no window?!");
-    window.set_onwheel(Some(handle_wheel.as_ref().unchecked_ref()));
-    handle_wheel.forget();
 
-    let handle_keypress = {
-        let state = state.clone();
-        Closure::<dyn FnMut(KeyboardEvent)>::new(move |evt: KeyboardEvent| {
-            if evt.shift_key() {
-                match evt.key().as_ref() {
-                    "ArrowLeft" => {
-                        let iterations = state.borrow().iterations;
-                        state.borrow_mut().iterations = if iterations > 1 { iterations - 1 } else { 1 };
-                        state.borrow().draw();
-                    },
-                    "ArrowRight" => {
-                        let iterations = state.borrow().iterations;
-                        state.borrow_mut().iterations = iterations + 1;
-                        state.borrow().draw();
-                    },
-                    _ => {}
-                }
-            }
-        })
-    };
-    window.set_onkeydown(Some(handle_keypress.as_ref().unchecked_ref()));
-    handle_keypress.forget();
-*/
     Controller {
         state: state.clone()
     }
@@ -128,24 +99,24 @@ impl State {
     }
 
     fn zoom(&mut self, multiplier: f64) {
-            let canvas = get_context2d().canvas().expect("canvas missing!");
-            let (w, h) = (canvas.client_width() as f64, canvas.client_height() as f64);
-            let ratio = h / w;
+        let canvas = get_context2d().canvas().expect("canvas missing!");
+        let (w, h) = (canvas.client_width() as f64, canvas.client_height() as f64);
+        let ratio = h / w;
 
-            let Viewport { x0, x1, y0, y1 } = self.viewport.clone();
+        let Viewport { x0, x1, y0, y1 } = self.viewport.clone();
 
-            let center_x = (x0 + x1) / 2.0; 
-            let center_y = (y0 + y1) / 2.0; 
+        let center_x = (x0 + x1) / 2.0;
+        let center_y = (y0 + y1) / 2.0;
 
-            let half_width = (x1 - x0) / 2.0 * multiplier;
-            let half_height = half_width * ratio;
+        let half_width = (x1 - x0) / 2.0 * multiplier;
+        let half_height = half_width * ratio;
 
-            let viewport = Viewport { x0: center_x - half_width,
-                                      x1: center_x + half_width,
-                                      y0: center_y - half_height,
-                                      y1: center_y + half_height };
+        let viewport = Viewport { x0: center_x - half_width,
+                                  x1: center_x + half_width,
+                                  y0: center_y - half_height,
+                                  y1: center_y + half_height };
 
-            self.viewport = viewport; 
+        self.viewport = viewport;
     }
 }
 

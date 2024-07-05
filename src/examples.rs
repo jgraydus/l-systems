@@ -39,13 +39,11 @@ type LSystemExample = (&'static str, &'static str, fn() -> LSystem);
 
 pub const ALGAE: LSystemExample = (
     "algae",
-    r#"
-    LSYSTEM (
-        A,
-        (A -> AB, B -> A),
-        (A -> (MOVE 40), B -> (MOVE 40, TURN 25))
-    )
-    "#,
+r#"LSYSTEM (
+    A,
+    (A -> AB, B -> A),
+    (A -> (MOVE 40), B -> (MOVE 40, TURN 25))
+)"#,
     || LSystem::new(
         "A",
         HashMap::from([
@@ -61,13 +59,11 @@ pub const ALGAE: LSystemExample = (
 
 pub const KOCH: LSystemExample = (
     "koch",
-    r#"
-    LSYSTEM (
-        F,
-        (F -> F+F-F-F+F),
-        (F -> (MOVE 10), + -> (TURN 90), - -> (TURN -90))
-    )
-    "#, 
+r#"LSYSTEM (
+    F,
+    (F -> F+F-F-F+F),
+    (F -> (MOVE 10), + -> (TURN 90), - -> (TURN -90))
+)"#, 
     || LSystem::new(
         "F",
         HashMap::from([
@@ -83,13 +79,11 @@ pub const KOCH: LSystemExample = (
 
 pub const SIERPINSKI: LSystemExample = (
     "sierpinski",
-    r#"
-    LSYSTEM (
-        F-G-G,
-        (F -> F-G+F+G-F, G -> GG),
-        (F -> (MOVE 10), G -> (MOVE 10), + -> (TURN 120), - -> (TURN -120))
-    )
-    "#,
+r#"LSYSTEM (
+    F-G-G,
+    (F -> F-G+F+G-F, G -> GG),
+    (F -> (MOVE 10), G -> (MOVE 10), + -> (TURN 120), - -> (TURN -120))
+)"#,
     || LSystem::new(
         "F-G-G",
         HashMap::from([
@@ -107,18 +101,16 @@ pub const SIERPINSKI: LSystemExample = (
 
 pub const TREE: LSystemExample = (
     "tree",
-    r#"
-    LSYSTEM (
-        [0]++[0]++[0]++[0],
-        (1 -> 11, 0 -> 1[+0]-0),
-        (0 -> (MOVE 5),
-         1 -> (MOVE 5),
-         [ -> (PUSH),
-         ] -> (POP),
-         + -> (TURN 45),
-         - -> (TURN -45))
-    )
-    "#,
+r#"LSYSTEM (
+    [0]++[0]++[0]++[0],
+    (1 -> 11, 0 -> 1[+0]-0),
+    (0 -> (MOVE 5),
+     1 -> (MOVE 5),
+     [ -> (PUSH),
+     ] -> (POP),
+     + -> (TURN 45),
+     - -> (TURN -45))
+)"#,
     || LSystem::new(
         "[0]++[0]++[0]++[0]",
         HashMap::from([
@@ -138,16 +130,14 @@ pub const TREE: LSystemExample = (
 
 pub const DRAGON: LSystemExample = (
     "dragon",
-    r#"
-    LSYSTEM (
-        F,
-        (F -> F+G, G -> F-G),
-        (F -> (MOVE 10),
-         G -> (MOVE 10),
-         + -> (TURN 90),
-         - -> (TURN -90))
-    )
-    "#,
+r#"LSYSTEM (
+    F,
+    (F -> F+G, G -> F-G),
+    (F -> (MOVE 10),
+     G -> (MOVE 10),
+     + -> (TURN 90),
+     - -> (TURN -90))
+)"#,
     || LSystem::new(
         "F",
         HashMap::from([
@@ -165,17 +155,15 @@ pub const DRAGON: LSystemExample = (
 
 pub const PLANT: LSystemExample = (
     "plant",
-    r#"
-    LSYSTEM (
-        ++X,
-        (X -> F+[[X]-X]-F[-FX]+X, F -> FF),
-        (F -> (MOVE 10),
-         + -> (TURN 25),
-         - -> (TURN -25),
-         [ -> (PUSH),
-         ] -> (POP))
-    )
-    "#,
+r#"LSYSTEM (
+    ++X,
+    (X -> F+[[X]-X]-F[-FX]+X, F -> FF),
+    (F -> (MOVE 10),
+     + -> (TURN 25),
+     - -> (TURN -25),
+     [ -> (PUSH),
+     ] -> (POP))
+)"#,
     || LSystem::new(
         "++X",
         HashMap::from([
@@ -184,7 +172,6 @@ pub const PLANT: LSystemExample = (
         ]),
         HashMap::from([
             ('F', vec![TurtleCommand::Move(10.0)]),
-            ('X', vec![]),
             ('+', vec![TurtleCommand::Turn(25.0)]),
             ('-', vec![TurtleCommand::Turn(-25.0)]),
             ('[', vec![TurtleCommand::Push]),
@@ -195,13 +182,11 @@ pub const PLANT: LSystemExample = (
 
 pub const LEVY: LSystemExample = (
     "levy",
-    r#"
-    LSYSTEM (
-        F,
-        (F -> +F--F+),
-        (F -> (MOVE 10), + -> (TURN 45), - -> (TURN -45))
-    )
-    "#,
+r#"LSYSTEM (
+    F,
+    (F -> +F--F+),
+    (F -> (MOVE 10), + -> (TURN 45), - -> (TURN -45))
+)"#,
     || LSystem::new(
         "F",
         HashMap::from([
@@ -215,3 +200,6 @@ pub const LEVY: LSystemExample = (
     )
 );
 
+pub fn all_examples() -> [LSystemExample; 7] {
+    [ALGAE, KOCH, SIERPINSKI, TREE, DRAGON, PLANT, LEVY]
+}

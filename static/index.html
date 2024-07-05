@@ -45,38 +45,44 @@
 		<script>
 			let iterations = 10;
 
-			function doIt() {
-			    if (window.x) {
-				if (!window.controller) {
-				   window.controller = window.x.init(); 
+			let with_controller = (() => {
+			    let controller = null;
+
+		            return (fn => {
+				if (!controller && window.l_system) {
+				    controller = window.l_system.init();
 				}
+				if (controller) { fn(controller); }
+                            });
+			})()
+
+			function draw() {
+			    with_controller(controller => {
                                 const editor = document.getElementById("editor");
                                 const value = editor.value;
-				window.controller.set_program(value);
-				window.controller.set_iterations(iterations);
-			        window.controller.draw();
-			    }
+				controller.set_program(value);
+				controller.set_iterations(iterations);
+			        controller.draw();
+			    });
 			}
 
 			function incrementIterations() {
-				iterations += 1;
-				document.getElementById("iterations").value = iterations;
-				doIt();
+			    iterations += 1;
+			    document.getElementById("iterations").value = iterations;
+		            draw();
 			}
 
 			function decrementIterations() {
-				if (iterations > 1) {
-					iterations -= 1;
-				}
-				document.getElementById("iterations").value = iterations;
-				doIt();
+			    if (iterations > 1) { iterations -= 1; }
+			    document.getElementById("iterations").value = iterations;
+			    draw();
 			}
 
 			function zoom(multiplier) {
-				if (window.controller) {
-				        window.controller.zoom(multiplier);
-				        doIt();
-				}
+			    with_controller(controller => {
+			        controller.zoom(multiplier);
+			        draw();
+			    });
 			}
 		</script>
 	</head>
@@ -100,10 +106,10 @@ LSYSTEM (
 					<button onclick="zoom(1.1)">-</button>
 					<button onclick="zoom(0.9)">+</button>
 				</div>
-				<button onclick="doIt()">submit</button>
+				<button onclick="draw()">submit</button>
 			</div>
 		</div>
 
-		<script src="index.js"></script>
+		<script type="module" src="local.js"></script>
 	</body>
 </html>
