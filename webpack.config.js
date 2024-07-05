@@ -6,7 +6,7 @@ const dist = path.resolve(__dirname, "dist");
 
 module.exports = {
 	mode: "production",
-	entry: { index: "./js/index.js" },
+	entry: { index: "./js/index.js", local: "./js/local.js" },
 	experiments: {
 		asyncWebAssembly: true,
 	},
