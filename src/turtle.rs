@@ -138,13 +138,16 @@ impl Turtle {
                     stack.push(self.clone());
                 },
                 TurtleCommand::Pop => {
-                    let t = stack.pop().expect("cannot pop empty stack");
-                    self.location = t.location;
-                    let (x, y) = self.location;
-                    result.push(DrawCommand::MoveTo(x, y));
-                    self.orientation = t.orientation;
-                    self.pen = t.pen;
-                    result.append(&mut self.pen.run());
+                    if let Some(t) = stack.pop() {
+                        self.location = t.location;
+                        let (x, y) = self.location;
+                        result.push(DrawCommand::MoveTo(x, y));
+                        self.orientation = t.orientation;
+                        self.pen = t.pen;
+                        result.append(&mut self.pen.run());
+                    } else {
+                        web_sys::console::log_1(&"cannot pop an empty stack".into());
+                    }
                 },
             }
         }
