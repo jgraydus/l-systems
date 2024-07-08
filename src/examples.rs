@@ -6,8 +6,8 @@ use crate::parser::*;
 use crate::turtle::*;
 
 pub fn turtle_example() -> TurtleProgram {
-    TurtleProgram {
-        turtle: Turtle {
+    TurtleProgram::new(
+        Turtle {
             location: (0.0, 0.0),
             orientation: 0.0,
             pen: Pen {
@@ -16,7 +16,7 @@ pub fn turtle_example() -> TurtleProgram {
                 state: PenState::Down,
             }
         },
-        commands: vec![
+        vec![
             TurtleCommand::Repeat(8, vec![
                 TurtleCommand::Push,
                 TurtleCommand::PenUp,
@@ -32,7 +32,7 @@ pub fn turtle_example() -> TurtleProgram {
                 TurtleCommand::Turn(45.0),
             ]),
         ],
-    }
+    )
 }
 
 type LSystemExample = (&'static str, &'static str, fn() -> LSystem);

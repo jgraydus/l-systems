@@ -1,3 +1,4 @@
+mod draw;
 mod examples;
 mod l_system;
 mod parser;
@@ -8,9 +9,9 @@ use std::{cell::RefCell, rc::Rc};
 use wasm_bindgen::prelude::*;
 use web_sys::{Event};
 
+use draw::*;
 use examples::all_examples;
 use parser::parse;
-use turtle::*;
 use util::*;
 
 #[wasm_bindgen]
@@ -75,7 +76,7 @@ pub fn init() -> Controller {
 }
 
 impl State {
-    fn draw(&self) -> Result<(), JsValue>{
+    fn draw(&self) -> Result<(), JsValue> {
         let program = self.program.clone();
         let iterations = self.iterations;
         let viewport = self.viewport.clone();
@@ -83,10 +84,12 @@ impl State {
         if let Some(input) = program {
             match parse(&input) {
                 Ok(lsystem) => {
-                    let program = lsystem.compile(iterations);
+                    let program =
+                        if false { lsystem.compile_stream(iterations) }
+                        else { lsystem.compile(iterations) };
                     let context = get_context2d();
                     clear_canvas(&context);
-                    program.execute(&context, viewport);
+                    program.execute(context, viewport);
                     return Ok(());
                 }
                 Err(err) => {
